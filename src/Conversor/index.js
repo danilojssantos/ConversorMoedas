@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
-import {View, Text , StyleSheet, TextInput,TouchableOpacity} from 'react-native';
+import {View, Text , StyleSheet, TextInput,TouchableOpacity, Keyboard} from 'react-native';
+import api from '../services/api';
 //https://free.currconv.com/api/v7/convert?q=USD_BRL&compact=ultra&apiKey=93540d12e5b3eed1e883
 class Conversor extends Component{
  
@@ -16,8 +17,21 @@ class Conversor extends Component{
     this.converter = this.converter.bind(this);
   }
 
-  converter(){
+  //requessição
+  async converter(){
+    let de_para = this.state.moedaA + '_' + this.state.moedaB;
     
+    const response = await api.get(`convert?q=${de_para}&compact=ultra&apiKey=93540d12e5b3eed1e883`);
+    
+    let cotacao = response.data[de_para];
+
+    let resultado = (cotacao * parseFloat(this.state.moedaB_valor));
+
+    this.setState({
+      valorConvertido: resultado.toFixed(2)
+    });
+    //Fechar teclado
+    Keyboard.dismiss();
   }
 
 
@@ -41,7 +55,7 @@ class Conversor extends Component{
        </TouchableOpacity>
 
        <Text style={styles.valorConvertido}>
-         {this.state.valorConvertido}
+        $ {(this.state.valorConvertido === 0) ? '' : this.state.valorConvertido}
        </Text>
       </View>
     );
